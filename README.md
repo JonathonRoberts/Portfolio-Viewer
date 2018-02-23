@@ -1,5 +1,6 @@
 # Portfolio-Viewer
 TODO:
+Fix C version
 Add commodities
-Add config file to  specify currency
-Get specified currencies from Yahoo finance
+Add foreign markets
+Add option to change currency
