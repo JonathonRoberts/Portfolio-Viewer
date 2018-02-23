@@ -21,7 +21,7 @@ sub lsequote{
 	foreach(@nodes){
 		$content = $_->findvalue('div[2]');
 		if ( $content =~/^\d*\.?\d*/i){ #check we've found a float
-			return $content;
+			return $content\100;
 		}
 	}
 }
@@ -34,13 +34,12 @@ sub cryptoquote{
 }
 
 my $wealth = 0;
-my $message;
 my $amount;
 my $price;
 my $ticker;
 my $config = "config";
 
-printf("Asset\t|\tPrice\t|\tAmount\t|\tWorth\n");
+my $message .= sprintf("Asset\t|\tPrice\t|\tAmount\t|\tWorth\n");
 
 open(my $fh, "<", $config)
 	or die "Can't open < $config: $!";
@@ -51,7 +50,7 @@ while(<$fh>){
 			$ticker = $1;
 			$amount = $2;
 			$price=&lsequote($ticker);
-			printf(" %s\t |\t%.2f\t |\t%.2f\t |\t%.2f\n",$ticker,$price, $amount,$price*$amount);
+			$message .= sprintf(" %s\t |\t%.2f\t |\t%.2f\t |\t%.2f\n",$ticker,$price, $amount,$price*$amount);
 			$wealth+=$price*$amount;
 		}
 	}
@@ -60,17 +59,16 @@ while(<$fh>){
 			$ticker = $1;
 			$amount = $2;
 			$price=&cryptoquote($ticker);
-			printf(" %s\t |\t%.2f\t |\t%.2f\t |\t%.2f\n",$ticker,$price, $amount,$price*$amount);
+			$message .= sprintf(" %s\t |\t%.2f\t |\t%.2f\t |\t%.2f\n",$ticker,$price, $amount,$price*$amount);
 			$wealth+=$price*$amount;
 		}
 	}
 }
-printf("Net = %.2f\n",$wealth);
+$message .= sprintf("Net = %.2f\n",$wealth);
 
 
 
 if(defined($message)){
-	print $message;
 	my $smtpserver = 'smtp.server.com';
 	my $smtpport = 587;
 	my $smtpuser   = 'email@server.com';
@@ -90,13 +88,12 @@ if(defined($message)){
 	header => [
 	To      => 'recipient@server.com',
 	From    => $smtpuser,
-	Subject => 'Allkeyshop Offers',
+	Subject => 'Portfolio',
 	],
 	body => $message,
 	);
 
-	#sendmail($email, { transport => $transport });
-	print $message;
+	sendmail($email, { transport => $transport });
 	exit 0;
 }
 	exit 0;
